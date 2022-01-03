@@ -27,12 +27,15 @@ RUN apt-get update \
 		libicu-dev \
 		libzip-dev \
 		libssl-dev \
+		libxslt-dev \
 		default-mysql-client \
 		wget \
         unzip \
         libonig-dev
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install bcmath ctype curl dom fileinfo gd hash iconv intl json libxml mbstring openssl pcre pdo_mysql simplexml soap sockets sodium xmlwriter xsl zip
+RUN docker-php-ext-install -j$(nproc) bcmath gd intl pdo_mysql simplexml soap sockets xsl zip
+
+RUN echo "<?php phpinfo(); ?>" > index.php
 
 EXPOSE 80
