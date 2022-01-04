@@ -16,6 +16,11 @@ docker run -d -e VIRTUAL_HOST=magento2.ataberkylmz.com --name magento magento2
 ```
 Nginx reverse proxy needs the image to have `EXPOSE 80` or other EXPOSE ports in the Dockerfile.
 
+# Running Nginx Reverse Proxy
+```bash
+docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
+```
+
 # Running MySQL Image
 ```bash
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=magento -e MYSQL_USER=magento -e MYSQL_PASSWORD=magento -d mysql:8.0
