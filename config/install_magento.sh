@@ -7,6 +7,8 @@ else
         #rm magento.tar.gz
 fi
 
+
+# DO NOT DO IT HERE, But do it in Dockerfile.
 APACHE_ERROR = 0
 a2enmod -q rewrite || APACHE_ERROR = 1
 apache2ctl -k graceful || APACHE_ERROR = 1
@@ -17,6 +19,7 @@ if [[ APACHE_ERROR -eq 1 ]]; then
 else
         echo "ENABLED REWRITE AND RESTARTED APACHE SUCCESSFULLY"
 fi
+#---
 
 if [[ -e /usr/local/bin/composer ]]; then
         echo "Composer already exists"
@@ -27,6 +30,7 @@ else
         mv composer.phar /usr/local/bin/composer
 fi
 
+## Find a way yo see if Magento is already installed or not, if so skip
 composer install -n
 
 find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
@@ -54,12 +58,19 @@ bin/magento setup:install \
 --use-rewrites=1 \
 --cleanup-database
 
-bin/magento setup:upgrade;
-bin/magento setup:di:compile;
-bin/magento setup:static-content:deploy -f;
-bin/magento indexer:reindex;
-bin/magento cache:clean;
-bin/magento cache:flush;
-rm -rf generated/metadata/* generated/code/*;
+bin/magento setup:di:compile
+bin/magento setup:static-content:deploy -f
+bin/magento indexer:reindex
+bin/magento cache:clean
+bin/magento cache:flush
+rm -rf generated/metadata/* generated/code/*
 bin/magento deploy:mode:set developer
 bin/magento maintenance:disable
+bin/magento sampledata:deploy
+bin/magento cron:install
+
+
+# DO NOT DO IT HERE, but create another image based on this Magento image.
+composer require adyen/module-payment -n
+bin/magento module:enable Adyen_Payment
+bin/magento setup:upgrade

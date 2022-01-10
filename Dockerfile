@@ -2,11 +2,11 @@ FROM php:7.4-apache
 LABEL maintainer="Ata Berk YILMAZ <me@ataberkylmz.com>"
 
 ENV MAGENTO_HOST=192.168.1.187:8080 \
-DB_SERVER=mysql \
+DB_SERVER=mariadb \
 DB_NAME=magento \
 DB_USER=magento \
 DB_PASSWORD=magento \
-DB_PREFIX=m2 \
+DB_PREFIX=m2_ \
 ELASTICSEARCH_SERVER=elasticsearch \
 ADMIN_NAME=Ata \
 ADMIN_LASTNAME=Yilmaz \
@@ -30,7 +30,8 @@ RUN apt-get update \
 		libxslt-dev \
 		default-mysql-client \
 		wget \
-    unzip 
+		cron \
+		unzip 
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install -j$(nproc) bcmath gd intl pdo_mysql simplexml soap sockets xsl zip
@@ -39,5 +40,9 @@ COPY config/php.ini /usr/local/etc/php/
 COPY config/install_magento.sh install_magento.sh
 
 ADD https://github.com/magento/magento2/archive/refs/tags/2.4.2.tar.gz magento.tar.gz
+
+RUN chmod +x install_magento.sh
+
+CMD ["bash", "install_magento.sh"]
 
 EXPOSE 80
