@@ -26,3 +26,40 @@ else
         rm composer-setup.php
         mv composer.phar /usr/local/bin/composer
 fi
+
+composer install -n
+
+find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
+find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+chown -R www-data:www-data .
+chmod u+x bin/magento
+
+bin/magento setup:install \
+--base-url=http://$MAGENTO_HOST \
+--elasticsearch-host=$ELASTICSEARCH_SERVER \
+--db-host=$DB_SERVER \
+--db-name=$DB_NAME \
+--db-user=$DB_USER \
+--db-password=$DB_PASSWORD \
+--db-prefix=$DB_PREFIX \
+--admin-firstname=$ADMIN_NAME \
+--admin-lastname=$ADMIN_LASTNAME \
+--admin-email=$ADMIN_EMAIL \
+--admin-user=$ADMIN_USERNAME \
+--admin-password=$ADMIN_PASSWORD \
+--backend-frontname=$ADMIN_URLEXT \
+--language=en_US \
+--currency=EUR \
+--timezone=Europe/Amsterdam \
+--use-rewrites=1 \
+--cleanup-database
+
+bin/magento setup:upgrade;
+bin/magento setup:di:compile;
+bin/magento setup:static-content:deploy -f;
+bin/magento indexer:reindex;
+bin/magento cache:clean;
+bin/magento cache:flush;
+rm -rf generated/metadata/* generated/code/*;
+bin/magento deploy:mode:set developer
+bin/magento maintenance:disable
