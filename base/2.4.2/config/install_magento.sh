@@ -103,4 +103,14 @@ fi
 #	echo "Sample data is already installed"
 #fi
 
+grep "ServerName" /etc/apache2/apache2.conf > /dev/null 2>&1
+SERVERNAME_EXISTS=$?
+
+if [ $SERVERNAME_EXISTS -eq 0 ]; then
+	echo "ServerName is already added in Apache config."
+else
+	echo "ServerName $MAGENTO_HOST" >> /etc/apache2/apache2.conf
+	echo "ServerName is added to Apache config."
+fi
+
 exec apache2-foreground

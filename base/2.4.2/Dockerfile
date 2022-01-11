@@ -18,8 +18,6 @@ MAGENTO_LANGUAGE=en_US \
 MAGENTO_CURRENCY=EUR \
 MAGENTO_TZ=Europe/Amsterdam
 
-RUN echo "ServerName $MAGENTO_HOST" >> /etc/apache2/apache2.conf
-
 RUN apt-get update \
 	&& apt-get install -y libjpeg62-turbo-dev \
 		libpng-dev \
