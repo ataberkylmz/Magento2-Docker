@@ -21,6 +21,11 @@ Nginx reverse proxy needs the image to have `EXPOSE 80` or other EXPOSE ports in
 docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
 ```
 
+# Running MariaDB Image
+```bash
+docker run -d --net backend --name mariadb -e MARIADB_USER=magento -e MARIADB_PASSWORD=magento -e MARIADB_ROOT_PASSWORD=root -e MARIADB_DATABASE=magento mariadb:10.4
+```
+
 # Running MySQL Image
 ```bash
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=magento -e MYSQL_USER=magento -e MYSQL_PASSWORD=magento -d mysql:8.0
@@ -42,7 +47,10 @@ docker network connect network_name container_name
 
 # Running Elasticsearch
 ```bash
-docker run -d --name elasticsearch --net network_name -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:tag
+docker run -d -m 512m --name elasticsearch --net backend -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.16.2
 ```
 
-
+# Running Magento 2 Image from Dockerhub
+```bash
+docker run -d -e VIRTUAL_HOST=magento2.ataberkylmz.com -e DB_SERVER=mariadb -e ELASTICSEARCH_SERVER=elasticsearch -e MAGENTO_HOST=magento2.ataberkylmz.com --net backend --name magento ataberkylmz/magento2:2.4.2
+```
