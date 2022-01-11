@@ -39,8 +39,11 @@ RUN docker-php-ext-install -j$(nproc) bcmath gd intl pdo_mysql simplexml soap so
 COPY config/php.ini /usr/local/etc/php/
 COPY config/install_magento.sh install_magento.sh
 
-ADD https://github.com/magento/magento2/archive/refs/tags/2.4.2.tar.gz magento.tar.gz
+# Apache configuration
+RUN if [ -x "$(command -v apache2-foreground)" ]; then a2enmod rewrite; fi
 
+ADD https://github.com/magento/magento2/archive/refs/tags/2.4.2.tar.gz magento.tar.gz
+ADD https://github.com/magento/magento2-sample-data/archive/refs/tags/2.4.2.tar.gz ../sample-data.tar.gz
 RUN chmod +x install_magento.sh
 
 CMD ["bash", "install_magento.sh"]
