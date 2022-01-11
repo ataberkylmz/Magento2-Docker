@@ -1,16 +1,16 @@
 FROM php:7.4-apache
 LABEL maintainer="Ata Berk YILMAZ <me@ataberkylmz.com>"
 
-ENV MAGENTO_HOST=192.168.1.187:8080 \
-DB_SERVER=mariadb \
+ENV MAGENTO_HOST="<will be defined>" \
+DB_SERVER="<will be defined>" \
 DB_NAME=magento \
 DB_USER=magento \
 DB_PASSWORD=magento \
 DB_PREFIX=m2_ \
-ELASTICSEARCH_SERVER=elasticsearch \
-ADMIN_NAME=Ata \
-ADMIN_LASTNAME=Yilmaz \
-ADMIN_EMAIL=me@ataberkylmz.com \
+ELASTICSEARCH_SERVER="<will be defined>" \
+ADMIN_NAME=admin \
+ADMIN_LASTNAME=admin \
+ADMIN_EMAIL=admin@example.com \
 ADMIN_USERNAME=admin \
 ADMIN_PASSWORD=admin123 \
 ADMIN_URLEXT=admin \
@@ -39,11 +39,11 @@ RUN docker-php-ext-install -j$(nproc) bcmath gd intl pdo_mysql simplexml soap so
 COPY config/php.ini /usr/local/etc/php/
 COPY config/install_magento.sh install_magento.sh
 
-# Apache configuration
 RUN if [ -x "$(command -v apache2-foreground)" ]; then a2enmod rewrite; fi
 
 ADD https://github.com/magento/magento2/archive/refs/tags/2.4.2.tar.gz magento.tar.gz
 ADD https://github.com/magento/magento2-sample-data/archive/refs/tags/2.4.2.tar.gz ../sample-data.tar.gz
+
 RUN chmod +x install_magento.sh
 
 CMD ["bash", "install_magento.sh"]

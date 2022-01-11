@@ -1,5 +1,41 @@
 #!/bin/bash
 
+if [ "$DB_SERVER" != "<will be defined>" ]; then
+    RET=1
+    while [ $RET -ne 0 ]; do
+        echo "Checking if $DB_SERVER is available."
+        mysql -h $DB_SERVER -u $DB_USER -p$DB_PASSWORD -e "status" > /dev/null 2>&1
+        RET=$?
+
+        if [ $RET -ne 0 ]; then
+            echo "Connection to MySQL/MariaDB is pending."
+            sleep 5
+        fi
+    done
+        echo "DB server $DB_SERVER is available."
+else
+	echo "MySQL/MariaDB server is not defined!"
+	exit 1
+fi
+
+if [ "$ELASTICSEARCH_SERVER" != "<will be defined>" ]; then
+	RET=1
+	while [ $RET -ne 0 ]; do
+		echo "Checking if $ELASTICSEARCH_SERVER is available."
+		curl -XGET "$ELASTICSEARCH_SERVER:9200/_cat/health?v&pretty" > /dev/null 2>&1
+		RET=$?
+
+		if [ $RET -ne 0 ]; then
+			echo "Connection to Elasticsearch is pending."
+			sleep 5
+		fi
+	done
+		echo "Elasticsearch server $ELASTICSEARCH_SERVER is available."
+else
+	echo "Elasticsearch server is not defined!"
+	exit 1
+fi
+
 if [[ -e ./pub/index.php ]]; then
         echo "Already extracted Magento"
 else
