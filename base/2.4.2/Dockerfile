@@ -3,11 +3,13 @@ LABEL maintainer="Ata Berk YILMAZ <me@ataberkylmz.com>"
 
 ENV MAGENTO_HOST="<will be defined>" \
 DB_SERVER="<will be defined>" \
+DB_PORT=3306 \
 DB_NAME=magento \
 DB_USER=magento \
 DB_PASSWORD=magento \
 DB_PREFIX=m2_ \
 ELASTICSEARCH_SERVER="<will be defined>" \
+ELASTICSEARCH_PORT=9200 \
 ADMIN_NAME=admin \
 ADMIN_LASTNAME=admin \
 ADMIN_EMAIL=admin@example.com \

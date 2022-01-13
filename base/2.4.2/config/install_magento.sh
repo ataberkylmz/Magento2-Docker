@@ -4,7 +4,7 @@ if [ "$DB_SERVER" != "<will be defined>" ]; then
     RET=1
     while [ $RET -ne 0 ]; do
         echo "Checking if $DB_SERVER is available."
-        mysql -h $DB_SERVER -u $DB_USER -p$DB_PASSWORD -e "status" > /dev/null 2>&1
+        mysql -h $DB_SERVER -P $DB_PORT -u $DB_USER -p$DB_PASSWORD -e "status" > /dev/null 2>&1
         RET=$?
 
         if [ $RET -ne 0 ]; then
@@ -22,7 +22,7 @@ if [ "$ELASTICSEARCH_SERVER" != "<will be defined>" ]; then
 	RET=1
 	while [ $RET -ne 0 ]; do
 		echo "Checking if $ELASTICSEARCH_SERVER is available."
-		curl -XGET "$ELASTICSEARCH_SERVER:9200/_cat/health?v&pretty" > /dev/null 2>&1
+		curl -XGET "$ELASTICSEARCH_SERVER:$ELASTICSEARCH_PORT/_cat/health?v&pretty" > /dev/null 2>&1
 		RET=$?
 
 		if [ $RET -ne 0 ]; then
@@ -65,7 +65,8 @@ else
 	bin/magento setup:install \
 		--base-url=http://$MAGENTO_HOST \
 		--elasticsearch-host=$ELASTICSEARCH_SERVER \
-		--db-host=$DB_SERVER \
+		--elasticsearch-port=$ELASTICSEARCH_PORT \
+		--db-host=$DB_SERVER:$DB_PORT \
 		--db-name=$DB_NAME \
 		--db-user=$DB_USER \
 		--db-password=$DB_PASSWORD \
