@@ -103,6 +103,22 @@ fi
 #	echo "Sample data is already installed"
 #fi
 
+ISSET_USE_SSL=$(bin/magento config:show web/secure/use_in_frontend)
+
+if [ $USE_SSL -eq 1 ]; then
+	if [ $ISSET_USE_SSL -eq 1  ]; then
+		echo "Use SSL is set, but SSL is already enabled."
+	else
+		bin/magento setup:store-config:set \
+			--base-url-secure="https://$MAGENTO_HOST" \
+			--use-secure=1 \
+			--use-secure-admin=1
+		echo "SSL for Magento is configured."
+	fi
+else
+	echo "Use SSL is not set, skipping."
+fi
+
 grep "ServerName" /etc/apache2/apache2.conf > /dev/null 2>&1
 SERVERNAME_EXISTS=$?
 
