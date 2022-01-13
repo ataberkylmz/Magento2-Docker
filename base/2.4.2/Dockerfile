@@ -16,7 +16,8 @@ ADMIN_PASSWORD=admin123 \
 ADMIN_URLEXT=admin \
 MAGENTO_LANGUAGE=en_US \
 MAGENTO_CURRENCY=EUR \
-MAGENTO_TZ=Europe/Amsterdam
+MAGENTO_TZ=Europe/Amsterdam \
+USE_SSL=0
 
 RUN apt-get update \
 	&& apt-get install -y libjpeg62-turbo-dev \
