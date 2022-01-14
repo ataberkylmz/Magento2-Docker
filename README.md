@@ -1,56 +1,76 @@
-# Building a Docker image
-cd into the location of `Dockerfile` and then run:
+# Magento 2 base image for Docker
+
+## Supported tags
+
+`2.4.2`
+
+## How to run this image
+This image is based on the latest Apache version in the [official PHP image](https://registry.hub.docker.com/_/php/) and it required MySQL or MariaDB and Elasticsearch images. Requirements for database and Elasticsearch versions will differ in every Magento 2 base version. The image itself is build to work with a reverse proxy instead of binding the HTTP ports directly. You can find the simple running steps below or use a `docker-composer` file instead.
+
 ```bash
-docker build -t tag_name .
+# Create a network for Reverse Proxy, DB, Elasticsearch and Magento 2.
+$ docker network create backend
+# Run MariaDB/MySQL database image
+$ docker run -d --net backend --name mariadb -e MARIADB_USER=magento -e MARIADB_PASSWORD=magento -e MARIADB_ROOT_PASSWORD=root -e MARIADB_DATABASE=magento mariadb:10.4
+# Run Elasticsearch (change the ram amount if needed) image
+$ docker run -d -m 512m --name elasticsearch --net backend -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.16.2
+# Run Rever Proxy (if needed) image
+$ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro nginxproxy/nginx-proxy
+# Run Magento 2 base image
+$ docker run -d -e VIRTUAL_HOST=subdomain.yourdomain.tld -e DB_SERVER=mariadb -e ELASTICSEARCH_SERVER=elasticsearch -e MAGENTO_HOST=subdomain.yourdomain.tld --net backend --name magento2 ataberkylmz/magento2:2.4.2
 ```
 
-# Running a Docker Image
-Run with specific port mapping and deattached:
+### Running with SSL
+Create a network then run database and Elasticsearch images same as before:
 ```bash
-docker run -d -p 80:80 --name name_of_container name_of_image[:tag]
-docker run -d -p 80:80 --name magento magento2
-```
-If Nginx-reverse proxy is running, use VIRTUAL_HOST env variable:
-```bash
-docker run -d -e VIRTUAL_HOST=magento2.ataberkylmz.com --name magento magento2
-```
-Nginx reverse proxy needs the image to have `EXPOSE 80` or other EXPOSE ports in the Dockerfile.
-
-# Running Nginx Reverse Proxy
-```bash
-docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
+# Create a network for Reverse Proxy, DB, Elasticsearch and Magento 2.
+$ docker network create backend
+# Run MariaDB/MySQL database image
+$ docker run -d --net backend --name mariadb -e MARIADB_USER=magento -e MARIADB_PASSWORD=magento -e MARIADB_ROOT_PASSWORD=root -e MARIADB_DATABASE=magento mariadb:10.4
+# Run Elasticsearch (change the ram amount if needed) image
+$ docker run -d -m 512m --name elasticsearch --net backend -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.16.2
 ```
 
-# Running MariaDB Image
+Run Nginx reverse proxy:
 ```bash
-docker run -d --net backend --name mariadb -e MARIADB_USER=magento -e MARIADB_PASSWORD=magento -e MARIADB_ROOT_PASSWORD=root -e MARIADB_DATABASE=magento mariadb:10.4
+$ docker run -d --net backend --name nginx-proxy -p 8080:80 -p 4443:443 \
+    --volume certs:/etc/nginx/certs \
+    --volume vhost:/etc/nginx/vhost.d \
+    --volume html:/usr/share/nginx/html \
+    --volume /var/run/docker.sock:/tmp/docker.sock:ro \
+    nginxproxy/nginx-proxy
+```
+Run Acme container for Let's Encrypt:
+```bash
+$ docker run -d --name nginx-proxy-acme -e DEFAULT_EMAIL=mail@yourdomain.tld \
+    --volumes-from nginx-proxy \
+    --volume /var/run/docker.sock:/var/run/docker.sock:ro \
+    --volume acme:/etc/acme.sh \
+    nginxproxy/acme-companion
+```
+Run the image with SSL settings:
+```bash
+$ docker run -d -e VIRTUAL_HOST=subdomain.yourdomain.tld -e USE_SSL=1 -e LETSENCRYPT_HOST=subdomain.yourdomain.tld -e LETSENCRYPT_EMAIL=mail@yourdomain.tld -e DB_SERVER=mariadb -e ELASTICSEARCH_SERVER=elasticsearch -e MAGENTO_HOST=subdomain.yourdomain.tld --net backend --name magento2 ataberkylmz/magento2:2.4.2
 ```
 
-# Running MySQL Image
-```bash
-docker run --name mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=magento -e MYSQL_USER=magento -e MYSQL_PASSWORD=magento -d mysql:8.0
-```
-With the above, you can only connect to it from other containers if you know the ip address of it in the `bridge` network. However, if you create another network and add both of the containers, you can ping it by container name.
-
-# Creaating Network
-
-In order to create a network, run the below command
-```bash
-docker network create network_name
-```
-
-# Connecting Containers to a Network
-Run the below code to connect to a container to a network:
-```bash
-docker network connect network_name container_name
-```
-
-# Running Elasticsearch
-```bash
-docker run -d -m 512m --name elasticsearch --net backend -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.16.2
-```
-
-# Running Magento 2 Image from Dockerhub
-```bash
-docker run -d -e VIRTUAL_HOST=magento2.ataberkylmz.com -e DB_SERVER=mariadb -e ELASTICSEARCH_SERVER=elasticsearch -e MAGENTO_HOST=magento2.ataberkylmz.com --net backend --name magento ataberkylmz/magento2:2.4.2
-```
+## Environment variables
+- **MAGENTO_HOST**: Will be used while installing Magento, indicates the Magento host, \(default *\<will be defined\>*\), **Required**.
+- **DB_SERVER**: IP or Hostname of the MySQL/MariaDB server \(default *\<will be defined\>*\), **Required**.
+- **DB_PORT**: Port of the database server/instance \(default *3306*\)
+- **DB_NAME**: Database name in your Database host \(default *magento*\)
+- **DB_USER**: Database user \(default *magento*\)
+- **DB_PASSWORD**: Database password \(default *magento*\)
+- **DB_PREFIX**: Database table prefix \(default *m2_*\)
+- **ELASTICSEARCH_SERVER**: IP or Hostname of Elasticsearch server/container \(default *\<will be defined\>*\), **Required**.
+- **ELASTICSEARCH_PORT**: Port of the elasticsearch host/instance \(default *9200*\)
+- **ADMIN_NAME**: Admin first name \(default *admin*\)
+- **ADMIN_LASTNAME**: Admin last name \(default *admin*\)
+- **ADMIN_EMAIL**: Admin email \(default *admin@example.com*\)
+- **ADMIN_USERNAME**: Admin username for Magento 2 backend login \(default *admin*\)
+- **ADMIN_PASSWORD**: Admin password for Magento 2 backend login \(default *admin123*\)
+- **ADMIN_URLEXT**: Admin access URL extension, \<your_domain\>\/\<admin_extension\>  \(default *\admin*\)
+- **MAGENTO_LANGUAGE**: Language of Magento 2 \(default *en_US*\)
+- **MAGENTO_CURRENCY**: Currency of Magento 2 \(default *EUR*\)
+- **MAGENTO_TZ**: Timezone of Magento 2 instance (default *Europe/Amsterdam*\)
+- **DEPLOY_SAMPLEDATA**: Deploys the sample data of Magento 2 when active (default *0*\)
+- **USE_SSL**: Sets required SSL configs such as base-url-secure in Magento 2 config, requires `nginxproxy/acme-companion`  container and `LETSENCRYPT_HOST` env variable (default *0*\)
