@@ -132,4 +132,6 @@ else
 	echo "ServerName is added to Apache config."
 fi
 
+/etc/init.d/cron start
+
 exec apache2-foreground
