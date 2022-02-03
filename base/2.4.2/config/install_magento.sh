@@ -36,7 +36,19 @@ else
 	exit 1
 fi
 
-if [[ -e ./pub/index.php ]]; then
+if [[ -e /tmp/magento.tar.gz ]]; then
+	mv /tmp/magento.tar.gz /var/www/html
+else
+	echo "Magento 2 tar is already moved to /var/www/html"
+fi
+
+if [[ -e /tmp/sample-data.tar.gz ]]; then
+	mv /tmp/sample-data.tar.gz /var/www
+else
+	echo "Magento 2 sample data tar is alread moved to /var/www"
+fi
+
+if [[ -e /var/www/html/pub/index.php ]]; then
         echo "Already extracted Magento"
 else
         tar -xf magento.tar.gz --strip-components 1
