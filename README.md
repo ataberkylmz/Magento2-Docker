@@ -5,7 +5,7 @@
 `2.4.2`
 
 ## How to run this image
-This image is based on the latest Apache version in the [official PHP image](https://registry.hub.docker.com/_/php/) and it required MySQL or MariaDB and Elasticsearch images. Requirements for database and Elasticsearch versions will differ in every Magento 2 base version. The image itself is build to work with a reverse proxy instead of binding the HTTP ports directly. You can find the simple running steps below or use a `docker-composer` file instead.
+This image is based on the latest Apache version in the [official PHP image](https://registry.hub.docker.com/_/php/) and it required MySQL or MariaDB and Elasticsearch images. Requirements for database and Elasticsearch versions will differ in every Magento 2 base version. The image itself is build to work with a reverse proxy instead of binding the HTTP ports directly. You can find the simple running steps below or use a `docker-compose` file instead.
 
 ```bash
 # Create a network for Reverse Proxy, DB, Elasticsearch and Magento 2.
