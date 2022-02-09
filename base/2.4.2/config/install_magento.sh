@@ -78,6 +78,8 @@ else
 		--base-url=http://$MAGENTO_HOST \
 		--elasticsearch-host=$ELASTICSEARCH_SERVER \
 		--elasticsearch-port=$ELASTICSEARCH_PORT \
+		--elasticsearch-index-prefix=$ELASTICSEARCH_INDEX_PREFIX \
+		--elasticsearch-timeout=$ELASTICSEARCH_TIMEOUT \
 		--db-host=$DB_SERVER:$DB_PORT \
 		--db-name=$DB_NAME \
 		--db-user=$DB_USER \
