@@ -63,6 +63,8 @@ $ docker run -d -e VIRTUAL_HOST=subdomain.yourdomain.tld -e USE_SSL=1 -e LETSENC
 - **DB_PREFIX**: Database table prefix \(default *m2_*\)
 - **ELASTICSEARCH_SERVER**: IP or Hostname of Elasticsearch server/container \(default *\<will be defined\>*\), **Required**.
 - **ELASTICSEARCH_PORT**: Port of the elasticsearch host/instance \(default *9200*\)
+- **ELASTICSEARCH_INDEX_PREFIX**: Index prefix for Elasticsearch \(default *\magento2*\), **Required**.
+- **ELASTICSEARCH_TIMEOUT**: Timeout seconds for Elasticsearch connection \(default *15*\)
 - **ADMIN_NAME**: Admin first name \(default *admin*\)
 - **ADMIN_LASTNAME**: Admin last name \(default *admin*\)
 - **ADMIN_EMAIL**: Admin email \(default *admin@example.com*\)
