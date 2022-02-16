@@ -78,6 +78,8 @@ else
 		--base-url=http://$MAGENTO_HOST \
 		--elasticsearch-host=$ELASTICSEARCH_SERVER \
 		--elasticsearch-port=$ELASTICSEARCH_PORT \
+		--elasticsearch-index-prefix=$ELASTICSEARCH_INDEX_PREFIX \
+		--elasticsearch-timeout=$ELASTICSEARCH_TIMEOUT \
 		--db-host=$DB_SERVER:$DB_PORT \
 		--db-name=$DB_NAME \
 		--db-user=$DB_USER \
@@ -143,6 +145,8 @@ else
 	echo "ServerName $MAGENTO_HOST" >> /etc/apache2/apache2.conf
 	echo "ServerName is added to Apache config."
 fi
+
+/tmp/enable_debugging.sh
 
 /etc/init.d/cron start
 

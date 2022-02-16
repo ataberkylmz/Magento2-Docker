@@ -10,6 +10,8 @@ DB_PASSWORD=magento \
 DB_PREFIX=m2_ \
 ELASTICSEARCH_SERVER="<will be defined>" \
 ELASTICSEARCH_PORT=9200 \
+ELASTICSEARCH_INDEX_PREFIX=magento2 \
+ELASTICSEARCH_TIMEOUT=15 \
 ADMIN_NAME=admin \
 ADMIN_LASTNAME=admin \
 ADMIN_EMAIL=admin@example.com \
@@ -20,7 +22,12 @@ MAGENTO_LANGUAGE=en_US \
 MAGENTO_CURRENCY=EUR \
 MAGENTO_TZ=Europe/Amsterdam \
 DEPLOY_SAMPLEDATA=0 \
-USE_SSL=0
+USE_SSL=0 \
+XDEBUG_CLIENT_HOST=localhost \
+XDEBUG_CLIENT_PORT=9003 \
+XDEBUG_IDEKEY="PHPSTORM" \
+DEBUG_USERNAME=dev \
+DEBUG_USERPASS=dev
 
 RUN apt-get update \
 	&& apt-get install -y libjpeg62-turbo-dev \
@@ -45,16 +52,16 @@ RUN pecl install xdebug-3.1.3 \
 
 COPY config/php.ini /usr/local/etc/php/
 COPY config/install_magento.sh /tmp/install_magento.sh
+COPY config/enable_debugging.sh /tmp/enable_debugging.sh
 
 RUN if [ -x "$(command -v apache2-foreground)" ]; then a2enmod rewrite; fi
 
 ADD https://github.com/magento/magento2/archive/refs/tags/2.4.2.tar.gz /tmp/magento.tar.gz
 ADD https://github.com/magento/magento2-sample-data/archive/refs/tags/2.4.2.tar.gz /tmp/sample-data.tar.gz
 
-RUN chmod +x /tmp/install_magento.sh
+RUN chmod +x /tmp/install_magento.sh /tmp/enable_debugging.sh
 
-RUN useradd -rm -d /home/dev -s /bin/bash -g root -G sudo -u 1000 dev
-RUN echo 'dev:dev' | chpasswd
-RUN service ssh start
+RUN useradd -rm -d /home/$DEBUG_USERNAME -s /bin/bash -g root -G sudo -u 1000 $DEBUG_USERNAME
+RUN echo "$DEBUG_USERNAME:$DEBUG_USERPASS" | chpasswd
 
 CMD ["bash", "/tmp/install_magento.sh"]
