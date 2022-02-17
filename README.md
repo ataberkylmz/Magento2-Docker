@@ -120,7 +120,7 @@ Assuming that the `nginx-proxy` and `elasticsearch` containers already running i
         MARIADB_PASSWORD: magento
 
     web:
-      image: magento2:2.4.2-dev
+      image: ataberkylmz/magento2:2.4.2-dev
       container_name: magento2
       environment:
         - DB_SERVER=mariadb
