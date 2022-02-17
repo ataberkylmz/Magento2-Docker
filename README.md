@@ -103,6 +103,60 @@ networks:
       name: backend
 ```
 
+## Remote debugging
+Assuming that the `nginx-proxy` and `elasticsearch` containers already running in the background and the network `backend` is already created, run the below docker-compose file to create the container for Magento 2 and MariaDB.
+
+```yml
+  version: '3.9'
+
+  services:
+    db:
+      image: mariadb:10.4
+      container_name: mariadb
+      environment:
+        MARIADB_ROOT_PASSWORD: root
+        MARIADB_DATABASE: magento
+        MARIADB_USER: magento
+        MARIADB_PASSWORD: magento
+
+    web:
+      image: magento2:2.4.2-dev
+      container_name: magento2
+      environment:
+        - DB_SERVER=mariadb
+        - ELASTICSEARCH_SERVER=elasticsearch
+        - MAGENTO_HOST=subdomain.yourdomain.tld
+        - VIRTUAL_HOST=subdomain.yourdomain.tld
+        - LETSENCRYPT_HOST=subdomain.yourdomain.tld
+        - USE_SSL=1
+        - DEPLOY_SAMPLEDATA=1
+      networks: 
+        - backend
+        - default
+      volumes:
+        - type: volume
+          source: webdata
+          target: /var/www/html
+      ports:
+        - 2022:22/tcp
+        
+  volumes:
+    webdata:
+
+  networks:
+    backend:
+      external:
+        name: backend
+```
+
+Assuming that the container is running behind the reverse proxy and your local device cannot expose ports due to certain reasons, then you need to create an SSH tunnel between your local device and the container. After running the docker-compose, run the below command to create the SSH tunnel.
+
+```bash
+$ ssh -R 127.0.0.1:9003:127.0.0.1:9003 -p 2022 dev@subdomain.yourdomain.tld
+```
+
+After the tunnel is created, you can configure your IDE to listen on 9003 (or the your defined port).
+
 ## Environment variables
 - **MAGENTO_HOST**: Will be used while installing Magento, indicates the Magento host, \(default *\<will be defined\>*\), **Required**.
 - **DB_SERVER**: IP or Hostname of the MySQL/MariaDB server \(default *\<will be defined\>*\), **Required**.
