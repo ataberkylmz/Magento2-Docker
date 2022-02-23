@@ -123,7 +123,7 @@ fi
 ISSET_USE_SSL=$(bin/magento config:show web/secure/use_in_frontend)
 
 if [ $USE_SSL -eq 1 ]; then
-	if [ $ISSET_USE_SSL -eq 1  ]; then
+	if [ ${ISSET_USE_SSL:-0} -eq 1  ]; then
 		echo "Use SSL is set, but SSL is already enabled."
 	else
 		bin/magento setup:store-config:set \
@@ -144,6 +144,11 @@ if [ $SERVERNAME_EXISTS -eq 0 ]; then
 else
 	echo "ServerName $MAGENTO_HOST" >> /etc/apache2/apache2.conf
 	echo "ServerName is added to Apache config."
+fi
+
+if [[ -e /tmp/enable_debugging.sh ]]; then
+        echo "Configuring Xdebug"
+	/tmp/enable_debugging.sh
 fi
 
 /etc/init.d/cron start
