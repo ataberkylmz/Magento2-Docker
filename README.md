@@ -3,7 +3,7 @@
 
 ## Supported tags
 
-`2.3.7`, `2.3.7-dev`, `2.4.0`, `2.4.0-dev`, `2.4.1`, `2.4.1-dev`, `2.4.2`, `2.4.2-dev`, `2.4.3`, `2.4.3-dev`
+`2.3.6`, `2.3.6-dev`, `2.3.7`, `2.3.7-dev`, `2.4.0`, `2.4.0-dev`, `2.4.1`, `2.4.1-dev`, `2.4.2`, `2.4.2-dev`, `2.4.3`, `2.4.3-dev`
 
 ## How to run this image
 This image is based on the latest Apache version in the [official PHP image](https://registry.hub.docker.com/_/php/) and it required MySQL or MariaDB and Elasticsearch images. Requirements for database and Elasticsearch versions will differ in every Magento 2 base version. The image itself is build to work with a reverse proxy instead of binding the HTTP ports directly. You can find the simple running steps below or use a `docker-compose` file instead.
